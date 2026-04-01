@@ -131,6 +131,11 @@ public class AddEditItemActivity extends AppCompatActivity {
 
                     btnSave.setEnabled(true);
                 });
+            } else {
+                runOnUiThread(() -> {
+                    Toast.makeText(this, "Item not found", Toast.LENGTH_SHORT).show();
+                    finish();
+                });
             }
         });
     }
