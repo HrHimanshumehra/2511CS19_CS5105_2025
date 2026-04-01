@@ -1,9 +1,7 @@
 package com.inventory.manager;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.text.InputType;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -24,6 +22,7 @@ import com.inventory.manager.adapter.ItemAdapter;
 import com.inventory.manager.database.AppDatabase;
 import com.inventory.manager.database.ItemDao;
 import com.inventory.manager.model.Item;
+import com.inventory.manager.utils.Constants;
 import com.inventory.manager.utils.ImageUtils;
 
 import java.util.ArrayList;
@@ -44,16 +43,8 @@ public class MainActivity extends AppCompatActivity implements ItemAdapter.OnIte
     private ChipGroup chipGroupCategories;
     private Spinner spinnerSort;
 
-    private String selectedCategory = "All";
+    private String selectedCategory = Constants.CATEGORY_ALL;
     private int selectedSortIndex = 0; // 0=Date, 1=Name, 2=Quantity, 3=Price
-
-    private static final String[] CATEGORIES = {
-            "All", "Electronics", "Food", "Tools", "Clothing", "Office Supplies", "Other"
-    };
-
-    private static final String[] SORT_OPTIONS = {
-            "Date Added", "Name", "Quantity", "Price"
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -94,7 +85,7 @@ public class MainActivity extends AppCompatActivity implements ItemAdapter.OnIte
     }
 
     private void setupCategoryChips() {
-        for (String category : CATEGORIES) {
+        for (String category : Constants.FILTER_CATEGORIES) {
             Chip chip = new Chip(this);
             chip.setText(category);
             chip.setCheckable(true);
@@ -123,7 +114,7 @@ public class MainActivity extends AppCompatActivity implements ItemAdapter.OnIte
 
     private void setupSortSpinner() {
         ArrayAdapter<String> sortAdapter = new ArrayAdapter<>(
-                this, android.R.layout.simple_spinner_item, SORT_OPTIONS);
+                this, android.R.layout.simple_spinner_item, Constants.SORT_OPTIONS);
         sortAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerSort.setAdapter(sortAdapter);
 
@@ -145,7 +136,7 @@ public class MainActivity extends AppCompatActivity implements ItemAdapter.OnIte
         executor.execute(() -> {
             List<Item> items;
 
-            if (selectedCategory.equals("All")) {
+            if (selectedCategory.equals(Constants.CATEGORY_ALL)) {
                 switch (selectedSortIndex) {
                     case 1:
                         items = itemDao.getAllSortedByName();
@@ -231,7 +222,13 @@ public class MainActivity extends AppCompatActivity implements ItemAdapter.OnIte
                         return;
                     }
 
-                    int amount = Integer.parseInt(amountStr);
+                    int amount;
+                    try {
+                        amount = Integer.parseInt(amountStr);
+                    } catch (NumberFormatException e) {
+                        Toast.makeText(this, "Please enter a valid number", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     if (amount <= 0) {
                         Toast.makeText(this, "Amount must be greater than 0", Toast.LENGTH_SHORT).show();
                         return;

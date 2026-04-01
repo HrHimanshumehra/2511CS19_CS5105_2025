@@ -25,6 +25,7 @@ import com.bumptech.glide.Glide;
 import com.inventory.manager.database.AppDatabase;
 import com.inventory.manager.database.ItemDao;
 import com.inventory.manager.model.Item;
+import com.inventory.manager.utils.Constants;
 import com.inventory.manager.utils.ImageUtils;
 
 import java.io.File;
@@ -51,9 +52,6 @@ public class AddEditItemActivity extends AppCompatActivity {
     private String currentImagePath;
     private String cameraPhotoPath;
 
-    private static final String[] CATEGORIES = {
-            "Electronics", "Food", "Tools", "Clothing", "Office Supplies", "Other"
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -99,7 +97,7 @@ public class AddEditItemActivity extends AppCompatActivity {
 
     private void setupCategorySpinner() {
         ArrayAdapter<String> categoryAdapter = new ArrayAdapter<>(
-                this, android.R.layout.simple_spinner_item, CATEGORIES);
+                this, android.R.layout.simple_spinner_item, Constants.ITEM_CATEGORIES);
         categoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerCategory.setAdapter(categoryAdapter);
     }
@@ -115,8 +113,8 @@ public class AddEditItemActivity extends AppCompatActivity {
                     etLowStockThreshold.setText(String.valueOf(currentItem.getLowStockThreshold()));
 
                     // Set category spinner
-                    for (int i = 0; i < CATEGORIES.length; i++) {
-                        if (CATEGORIES[i].equals(currentItem.getCategory())) {
+                    for (int i = 0; i < Constants.ITEM_CATEGORIES.length; i++) {
+                        if (Constants.ITEM_CATEGORIES[i].equals(currentItem.getCategory())) {
                             spinnerCategory.setSelection(i);
                             break;
                         }
@@ -255,9 +253,18 @@ public class AddEditItemActivity extends AppCompatActivity {
             return;
         }
 
-        int quantity = Integer.parseInt(quantityStr);
-        double price = Double.parseDouble(priceStr);
-        int threshold = thresholdStr.isEmpty() ? 5 : Integer.parseInt(thresholdStr);
+        int quantity;
+        double price;
+        int threshold;
+        try {
+            quantity = Integer.parseInt(quantityStr);
+            price = Double.parseDouble(priceStr);
+            threshold = thresholdStr.isEmpty() ? Constants.DEFAULT_LOW_STOCK_THRESHOLD
+                    : Integer.parseInt(thresholdStr);
+        } catch (NumberFormatException e) {
+            Toast.makeText(this, "Please enter valid numbers", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         if (isEditMode && currentItem != null) {
             currentItem.setName(name);
