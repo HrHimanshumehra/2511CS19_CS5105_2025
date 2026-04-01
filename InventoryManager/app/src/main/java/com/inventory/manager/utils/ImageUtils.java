@@ -37,7 +37,11 @@ public class ImageUtils {
 
             if (bitmap == null) return null;
 
-            bitmap = resizeBitmap(bitmap, MAX_IMAGE_SIZE);
+            Bitmap resized = resizeBitmap(bitmap, MAX_IMAGE_SIZE);
+            if (resized != bitmap) {
+                bitmap.recycle();
+            }
+            bitmap = resized;
 
             File imageFile = createImageFile(context);
             FileOutputStream fos = new FileOutputStream(imageFile);
@@ -53,19 +57,32 @@ public class ImageUtils {
         }
     }
 
-    public static String saveImageFromBitmap(Context context, Bitmap bitmap) {
+    public static String saveImageFromFile(Context context, String filePath) {
         try {
+            if (filePath == null) return null;
+
+            Bitmap bitmap = BitmapFactory.decodeFile(filePath);
             if (bitmap == null) return null;
 
-            bitmap = resizeBitmap(bitmap, MAX_IMAGE_SIZE);
+            Bitmap resized = resizeBitmap(bitmap, MAX_IMAGE_SIZE);
+            if (resized != bitmap) {
+                bitmap.recycle();
+            }
 
             File imageFile = createImageFile(context);
             FileOutputStream fos = new FileOutputStream(imageFile);
-            bitmap.compress(Bitmap.CompressFormat.JPEG, 85, fos);
+            resized.compress(Bitmap.CompressFormat.JPEG, 85, fos);
             fos.flush();
             fos.close();
+            resized.recycle();
 
-            return imageFile.getAbsolutePath();
+            // Delete original full-resolution file if a new file was created
+            String newPath = imageFile.getAbsolutePath();
+            if (!newPath.equals(filePath)) {
+                new File(filePath).delete();
+            }
+
+            return newPath;
         } catch (IOException e) {
             e.printStackTrace();
             return null;
