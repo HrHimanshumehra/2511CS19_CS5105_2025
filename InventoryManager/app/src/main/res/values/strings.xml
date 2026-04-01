@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Inventory Manager</string>
+    <string name="add_item">Add Item</string>
+    <string name="edit_item">Edit Item</string>
+    <string name="delete_item">Delete Item</string>
+    <string name="item_name">Item Name</string>
+    <string name="category">Category</string>
+    <string name="quantity">Quantity</string>
+    <string name="price">Price</string>
+    <string name="low_stock_threshold">Low Stock Threshold (default: 5)</string>
+    <string name="save">Save</string>
+    <string name="camera">Camera</string>
+    <string name="gallery">Gallery</string>
+    <string name="item_image">Item image</string>
+    <string name="use_stock">Use Stock</string>
+    <string name="units_to_remove">Units to remove</string>
+    <string name="low_stock_warning">LOW STOCK</string>
+    <string name="empty_inventory">No items yet.\nTap + to add your first item.</string>
+    <string name="sort_by">Sort by</string>
+</resources>
