@@ -3,7 +3,6 @@ package com.inventory.manager;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -72,6 +71,7 @@ public class AddEditItemActivity extends AppCompatActivity {
         int itemId = getIntent().getIntExtra("item_id", -1);
         if (itemId != -1) {
             isEditMode = true;
+            btnSave.setEnabled(false);
             setTitle("Edit Item");
             loadItem(itemId);
         } else {
@@ -128,6 +128,13 @@ public class AddEditItemActivity extends AppCompatActivity {
                                 .centerCrop()
                                 .into(ivItemImage);
                     }
+
+                    btnSave.setEnabled(true);
+                });
+            } else {
+                runOnUiThread(() -> {
+                    Toast.makeText(this, "Item not found", Toast.LENGTH_SHORT).show();
+                    finish();
                 });
             }
         });
@@ -208,7 +215,9 @@ public class AddEditItemActivity extends AppCompatActivity {
 
         if (resultCode == RESULT_OK) {
             if (requestCode == REQUEST_CAMERA && cameraPhotoPath != null) {
-                currentImagePath = cameraPhotoPath;
+                // Resize and compress camera image like gallery images
+                String compressedPath = ImageUtils.saveImageFromFile(this, cameraPhotoPath);
+                currentImagePath = compressedPath != null ? compressedPath : cameraPhotoPath;
                 Glide.with(this)
                         .load(new File(currentImagePath))
                         .centerCrop()
@@ -263,6 +272,11 @@ public class AddEditItemActivity extends AppCompatActivity {
                     : Integer.parseInt(thresholdStr);
         } catch (NumberFormatException e) {
             Toast.makeText(this, "Please enter valid numbers", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (isEditMode && currentItem == null) {
+            Toast.makeText(this, "Still loading item data, please wait...", Toast.LENGTH_SHORT).show();
             return;
         }
 
